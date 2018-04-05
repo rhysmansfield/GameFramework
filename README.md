@@ -1,0 +1,1 @@
+This is a very simple project, used souley to show that I have the ability to work with Java basics and work in multi-threading environments. This project does not include a working game framework, more an idea for where to start for new developers who only understand the basics of Java and wish to have a base to work from.
