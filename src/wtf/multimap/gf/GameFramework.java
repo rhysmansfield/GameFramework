@@ -1,5 +1,8 @@
 package wtf.multimap.gf;
 
+import wtf.multimap.gf.event.EventManager;
+import wtf.multimap.gf.event.events.GameTickEvent;
+import wtf.multimap.gf.listener.GameTickListener;
 import wtf.multimap.gf.logger.LogType;
 import wtf.multimap.gf.logger.Logger;
 import wtf.multimap.gf.thread.GameRunnable;
@@ -13,20 +16,15 @@ public class GameFramework {
     /**
      * Initialise variables for the main game class
      * Logger logger - Main logger object, used for client output
+     * EventManager eventManager - The event manager class
      * Map<String, Thread> processThreads - Mapping game threads,
      *
      * @param String - Name of the game thread
      * @param Thread - The thread object
      */
     private Logger logger;
+    private EventManager eventManager;
     private Map<String, Thread> processThreads;
-
-    /**
-     * Starting the game client
-     */
-    public static void main(String[] args) {
-        new GameFramework("New Game");
-    }
 
     /**
      * Initialising the main GameFramework class
@@ -35,6 +33,8 @@ public class GameFramework {
      */
     GameFramework(String gameName) {
         logger = new Logger(gameName);
+        eventManager = new EventManager();
+        eventManager.registerEvents(new GameTickListener());
         getLogger().log(LogType.INFO, "Starting game setup process...");
         getLogger().log(LogType.INFO, "Initialising multithreading environment...");
         Long timeToStartMultithreading = System.currentTimeMillis();
@@ -43,6 +43,13 @@ public class GameFramework {
         startThreads();
         Long timeFinishedStartingMultithreading = System.currentTimeMillis();
         getLogger().log(LogType.INFO, String.format("Initialised multithreading environment (Took: %d millis)", timeFinishedStartingMultithreading - timeToStartMultithreading));
+    }
+
+    /**
+     * Starting the game client
+     */
+    public static void main(String[] args) {
+        new GameFramework("New Game");
     }
 
     /**
@@ -68,12 +75,15 @@ public class GameFramework {
             @Override
             public void run() {
                 while (true) {
-                    // TODO: Call tick
+                    GameTickEvent gameTickEvent = (GameTickEvent) eventManager.callEvent(new GameTickEvent("Hello"));
+                    // if tick event is cancelled, the game will close;
+                    if (gameTickEvent.isCancelled()) System.exit(0);
                     try {
                         Thread.sleep(2000);
                         getLogger().log(LogType.INFO, "Game is ticking at 0.5tps");
                     } catch (InterruptedException e) {
                         getLogger().log(LogType.ERROR, "Game has failed to tick! closing...");
+                        System.exit(0);
                     }
                 }
             }
