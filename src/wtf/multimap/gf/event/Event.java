@@ -6,9 +6,7 @@ public abstract class Event {
     private boolean cancelled;
 
     public String getEventName() {
-        if (eventName == null) {
-            return getClass().getCanonicalName();
-        }
+        if (eventName == null) eventName = getClass().getCanonicalName();
         return eventName;
     }
 
