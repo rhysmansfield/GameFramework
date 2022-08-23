@@ -25,7 +25,6 @@ public class EventManager {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            ;
             if (event == null) continue;
             eventClassMap.computeIfAbsent(listener, k -> new ArrayList<Class>());
             eventClassMap.get(listener).add(event);
